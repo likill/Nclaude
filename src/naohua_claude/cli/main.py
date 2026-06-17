@@ -73,5 +73,9 @@ def main() -> None:
             follow=args.follow,
         )
     else:
-        parser.print_help()
-        sys.exit(1)
+        # 无子命令时：启动 daemon + 打开 TUI
+        from naohua_claude.cli.commands.core import cmd_core_start
+        from naohua_claude.tui.__main__ import main as tui_main
+
+        cmd_core_start(config)
+        tui_main()
