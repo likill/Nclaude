@@ -99,4 +99,7 @@ def _start_project_daemon_and_tui() -> None:
     cmd_core_start(config, state_dir=state_dir)
 
     from naohua_claude.tui.__main__ import main as tui_main
-    tui_main()
+    try:
+        tui_main()
+    finally:
+        cmd_core_stop(config, state_dir=state_dir)
