@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import os
 import sys
 
 from naohua_claude.cli.commands.chat import cmd_chat
@@ -15,7 +16,7 @@ from naohua_claude.core.logging_setup import setup_logging
 
 # CLI 主入口：解析命令行参数并分发到对应子命令
 def main() -> None:
-    parser = argparse.ArgumentParser(prog="kama", description="NaohuaClaude CLI")
+    parser = argparse.ArgumentParser(prog="naohua", description="NaohuaClaude CLI")
     parser.add_argument("--version", action="store_true", help="Print version and exit")
     subparsers = parser.add_subparsers(dest="command")
 
@@ -42,6 +43,11 @@ def main() -> None:
 
     if args.version:
         cmd_version()
+        return
+
+    # 无子命令时：per-project daemon + TUI
+    if args.command is None:
+        _start_project_daemon_and_tui()
         return
 
     config = get_config()
@@ -73,9 +79,24 @@ def main() -> None:
             follow=args.follow,
         )
     else:
-        # 无子命令时：启动 daemon + 打开 TUI
-        from naohua_claude.cli.commands.core import cmd_core_start
-        from naohua_claude.tui.__main__ import main as tui_main
+        parser.print_help()
+        sys.exit(1)
 
-        cmd_core_start(config)
-        tui_main()
+
+# 根据当前目录计算端口，启动专属 daemon，然后打开 TUI
+def _start_project_daemon_and_tui() -> None:
+    from naohua_claude.core.project import compute_port, project_state_dir
+
+    cwd = os.getcwd()
+    port = compute_port(cwd)
+    state_dir = project_state_dir(cwd)
+
+    os.environ["NAOHUA_PORT"] = str(port)
+
+    config = get_config()
+    setup_logging(config)
+
+    cmd_core_start(config, state_dir=state_dir)
+
+    from naohua_claude.tui.__main__ import main as tui_main
+    tui_main()
