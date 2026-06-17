@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find src:*)",
+      "Bash(uv run:*)",
+      "Bash(uv sync:*)"
+    ]
+  }
+}

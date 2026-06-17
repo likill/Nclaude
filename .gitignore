@@ -15,4 +15,4 @@ uv.lock
 .idea/
 .DS_Store
 *.log
-workspace/
+workspace/.claude/
