@@ -21,6 +21,14 @@ from textual.widgets import Label, Static, TextArea
 from naohua_claude.core.config import NaohuaConfig
 from naohua_claude.core.skills.loader import SkillLoader
 from naohua_claude.core.transport.socket_client import IpcError, SocketClient
+import pyfiglet
+
+def make_banner(text: str = "NAOHUACLAUDE") -> str:
+    raw = pyfiglet.figlet_format(text, font="standard")
+    lines = [f"[bold #ff69b4]{line}[/bold #ff69b4]" for line in raw.splitlines() if line.strip()]
+    lines.append("[dim]  输入消息开始对话  ·  键入 / 触发 skill  ·  Ctrl+C 退出[/dim]")
+    return "\n".join(lines)
+
 
 
 def _preview(s: str, n: int) -> str:
@@ -490,16 +498,16 @@ class NaohuaTuiApp(App[None]):
     Static.usage { padding: 0 2; }
     Static.log-line { padding: 0 2; }
     """
-
-    _BANNER = (
-        "[bold cyan]██╗  ██╗ █████╗ ███╗   ███╗ █████╗  ██████╗██╗      █████╗ ██╗   ██╗██████╗ ███████╗[/bold cyan]\n"
-        "[bold cyan]██║ ██╔╝██╔══██╗████╗ ████║██╔══██╗██╔════╝██║     ██╔══██╗██║   ██║██╔══██╗██╔════╝[/bold cyan]\n"
-        "[bold cyan]█████╔╝ ███████║██╔████╔██║███████║██║     ██║     ███████║██║   ██║██║  ██║█████╗  [/bold cyan]\n"
-        "[bold cyan]██╔═██╗ ██╔══██║██║╚██╔╝██║██╔══██║██║     ██║     ██╔══██║██║   ██║██║  ██║██╔══╝  [/bold cyan]\n"
-        "[bold cyan]██║  ██╗██║  ██║██║ ╚═╝ ██║██║  ██║╚██████╗███████╗██║  ██║╚██████╔╝██████╔╝███████╗[/bold cyan]\n"
-        "[bold cyan]╚═╝  ╚═╝╚═╝  ╚═╝╚═╝     ╚═╝╚═╝  ╚═╝ ╚═════╝╚══════╝╚═╝  ╚═╝ ╚═════╝ ╚═════╝ ╚══════╝[/bold cyan]\n"
-        "[dim]  输入消息开始对话  ·  键入 / 触发 skill  ·  Ctrl+C 退出[/dim]"
-    )
+    _BANNER = make_banner()
+    # _BANNER = (
+    #     "[bold cyan]██╗  ██╗ █████╗ ███╗   ███╗ █████╗  ██████╗██╗      █████╗ ██╗   ██╗██████╗ ███████╗[/bold cyan]\n"
+    #     "[bold cyan]██║ ██╔╝██╔══██╗████╗ ████║██╔══██╗██╔════╝██║     ██╔══██╗██║   ██║██╔══██╗██╔════╝[/bold cyan]\n"
+    #     "[bold cyan]█████╔╝ ███████║██╔████╔██║███████║██║     ██║     ███████║██║   ██║██║  ██║█████╗  [/bold cyan]\n"
+    #     "[bold cyan]██╔═██╗ ██╔══██║██║╚██╔╝██║██╔══██║██║     ██║     ██╔══██║██║   ██║██║  ██║██╔══╝  [/bold cyan]\n"
+    #     "[bold cyan]██║  ██╗██║  ██║██║ ╚═╝ ██║██║  ██║╚██████╗███████╗██║  ██║╚██████╔╝██████╔╝███████╗[/bold cyan]\n"
+    #     "[bold cyan]╚═╝  ╚═╝╚═╝  ╚═╝╚═╝     ╚═╝╚═╝  ╚═╝ ╚═════╝╚══════╝╚═╝  ╚═╝ ╚═════╝ ╚═════╝ ╚══════╝[/bold cyan]\n"
+    #     "[dim]  输入消息开始对话  ·  键入 / 触发 skill  ·  Ctrl+C 退出[/dim]"
+    # )
 
     # 初始化连接参数和 TUI 内部状态
     def __init__(self, host: str, port: int, replay_run_id: str | None = None) -> None:
