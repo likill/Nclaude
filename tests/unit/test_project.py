@@ -1,5 +1,9 @@
 from __future__ import annotations
 
+from pathlib import Path
+
+import pytest
+
 from naohua_claude.core.project import compute_port, project_state_dir
 
 
@@ -28,15 +32,18 @@ def test_port_in_range() -> None:
 
 
 # 功能：project_state_dir 返回以 hash 命名的子目录
-# 设计：验证返回路径包含 8 字符 hex 且在 ~/.naohua/projects/ 下
-def test_project_state_dir() -> None:
+# 设计：用 tmp_path 隔离文件系统，验证返回路径包含 8 字符 hex 且在临时目录下
+def test_project_state_dir(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr("naohua_claude.core.project._PROJECTS_DIR", tmp_path)
     d = project_state_dir("/home/user/project-a")
     assert len(d.name) == 8  # 8-char hex hash
+    assert d.parent == tmp_path
 
 
 # 功能：同一目录返回同一状态目录
-# 设计：确定性验证
-def test_project_state_dir_deterministic() -> None:
+# 设计：用 tmp_path 隔离，确定性验证
+def test_project_state_dir_deterministic(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr("naohua_claude.core.project._PROJECTS_DIR", tmp_path)
     d1 = project_state_dir("/home/user/project-a")
     d2 = project_state_dir("/home/user/project-a")
     assert d1 == d2
